@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Звонок на урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Nunito:wght@600;800&family=Onest:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eceff6;--sf:#fff;--ink:#141a33;--mu:#5d6785;--ln:#d5dbea;--acc:#f5a524;--ai:#1a1200;--disp:"Unbounded",system-ui,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1226;--sf:#171d3a;--ink:#eef1fb;--mu:#98a3c7;--ln:#2a3358}}
+:root[data-theme="dark"]{--bg:#0d1226;--sf:#171d3a;--ink:#eef1fb;--mu:#98a3c7;--ln:#2a3358}
+:root[data-font="soft"]{--disp:"Nunito",system-ui,sans-serif}
+:root[data-font="strict"]{--disp:"Onest",system-ui,sans-serif}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Onest",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+main{max-width:520px;margin:0 auto;padding:16px 16px 56px}
+button{font:inherit;font-weight:600;cursor:pointer;border-radius:12px;padding:9px 12px;border:1px solid var(--ln);background:var(--sf);color:var(--ink);transition:background .2s,transform .15s}
+button:active{transform:scale(.96)}
+button[aria-pressed="true"]{background:var(--acc);color:var(--ai);border-color:var(--acc)}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.hd{display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:10px;color:var(--acc)}
+.logo svg{transform-origin:50% 10%}
+.logo.swing svg{animation:sw 1.2s ease}
+h1{margin:0;font:700 1.15rem var(--disp);color:var(--ink)}
+.ic{width:42px;height:42px;padding:0;border-radius:50%;display:grid;place-items:center;font-size:1.5rem}
+.top{display:flex;justify-content:space-between;color:var(--mu);font-size:.95rem;margin-top:10px}
+.top b{color:var(--ink);font-variant-numeric:tabular-nums}
+.dial{container-type:inline-size;position:relative;width:min(90vw,340px);aspect-ratio:1;margin:10px auto 0}
+.dial svg{position:absolute;inset:0;width:100%;height:100%}
+.tk{stroke:var(--ln);stroke-width:3;stroke-linecap:round;transition:stroke .35s;animation:tin .5s both;animation-delay:calc(var(--i)*9ms)}
+.tk.lg{stroke-width:4.5}
+.tk.on{stroke:var(--acc)}
+.in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.st{margin:0;max-width:62cqw;font-weight:600;font-size:4.4cqw;line-height:1.25}
+.ct{margin:1.5cqw 0;font:700 15cqw/1 var(--disp);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.ct.lg{font-size:10.5cqw}
+.lb{margin:0;max-width:58cqw;font-size:4cqw;color:var(--mu);line-height:1.3}
+.cur{background:var(--sf);border:1px solid var(--ln);border-left:5px solid var(--acc);border-radius:18px;padding:14px 18px;margin-top:14px}
+.cur b{font:500 1.05rem/1.3 var(--disp)}
+.cur p{margin:4px 0 0;color:var(--mu);font-size:.95rem}
+.cur p b{font:600 .95rem "Onest",sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:22px 0 10px}
+.tabs button{position:relative;padding:9px 0}
+.tabs .today::after{content:"";position:absolute;left:50%;bottom:4px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:currentColor;opacity:.6}
+.rows{list-style:none;margin:0;padding:0;background:var(--sf);border:1px solid var(--ln);border-radius:20px;overflow:hidden}
+li{position:relative;display:grid;grid-template-columns:3.4rem 12px 1fr;gap:12px;align-items:start;padding:12px 16px;font-variant-numeric:tabular-nums}
+li::before{content:"";position:absolute;left:calc(16px + 3.4rem + 12px + 5px);top:0;bottom:0;width:2px;background:var(--ln)}
+li:first-child::before{top:23px}
+li:last-child::before{bottom:auto;height:23px}
+li:only-child::before,li.empty::before{display:none}
+li.empty{display:block;color:var(--mu)}
+.tm b{display:block;font-weight:600}
+.tm i{display:block;font-style:normal;font-size:.82rem;color:var(--mu)}
+.dt{position:relative;z-index:1;width:12px;height:12px;margin-top:5px;border-radius:50%;background:var(--sf);border:2px solid var(--ln)}
+.nm{padding-top:1px}
+li.past{color:var(--mu)}
+li.past .dt{background:var(--ln)}
+li.now{background:color-mix(in srgb,var(--acc) 14%,transparent);font-weight:600}
+li.now .dt{background:var(--acc);border-color:var(--acc);animation:pl 1.6s infinite}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,24px);opacity:0;pointer-events:none;background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:99px;font-weight:600;transition:.35s;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+dialog{border:0;padding:0;background:var(--sf);color:var(--ink);width:min(100%,520px);max-width:100%;margin:auto auto 0;border-radius:26px 26px 0 0;max-height:90vh}
+dialog[open]{animation:up .3s ease}
+dialog::backdrop{background:rgba(5,8,20,.55)}
+.sh{padding:18px 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.shh{display:flex;justify-content:space-between;align-items:center}
+.shh h2{margin:0;font:700 1.15rem var(--disp)}
+.rw p{margin:18px 0 8px;color:var(--mu);font-size:.9rem}
+.sg{display:flex;flex-wrap:wrap;gap:6px}
+.sg button{flex:1 1 auto}
+.sg .sw{flex:0 0 auto;width:40px;height:40px;padding:0;border-radius:50%;border:0}
+.sg .sw[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:2px}
+@keyframes tin{from{opacity:0}}
+@keyframes sw{20%{transform:rotate(18deg)}40%{transform:rotate(-16deg)}60%{transform:rotate(11deg)}80%{transform:rotate(-6deg)}}
+@keyframes pl{from{box-shadow:0 0 0 0 color-mix(in srgb,var(--acc) 65%,transparent)}to{box-shadow:0 0 0 10px transparent}}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+:root[data-anim="off"] *,:root[data-anim="off"] ::before,:root[data-anim="off"] ::after{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <header class="hd">
+    <div class="logo" id="logo"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><h1>Звонок</h1></div>
+    <button class="ic" id="gear" type="button" aria-label="Настройки"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 12h3M11 12h9M4 17h11M19 17h1"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="17" r="2"/></svg></button>
+  </header>
+  <div class="top"><span id="today"></span><b id="clock"></b></div>
+
+  <div class="dial">
+    <svg viewBox="0 0 300 300" id="tk" aria-hidden="true"></svg>
+    <div class="in" role="progressbar" aria-label="Время до звонка" id="bar" aria-valuemin="0" aria-valuemax="100">
+      <p class="st" id="status"></p>
+      <p class="ct" id="count">--:--</p>
+      <p class="lb" id="label"></p>
+    </div>
+  </div>
+
+  <section class="cur"><b id="sub"></b><p id="bellAt"></p></section>
+
+  <div class="tabs" id="tabs"></div>
+  <ul class="rows" id="rows"></ul>
+  <div class="toast" id="toast" role="status"></div>
+
+  <dialog id="dlg"><div class="sh"><div class="shh"><h2>Настройки</h2><button class="ic" id="close" type="button" aria-label="Закрыть">×</button></div><div id="sets"></div></div></dialog>
+</main>
+
+<script>
+const BELLS = ["09:00-09:40","09:55-10:35","10:55-11:35","11:50-12:30","12:50-13:30","13:50-14:30","14:40-15:20"]
+  .map(t => { const [a,b,c,d] = t.match(/\d+/g).map(Number); return {s:a*3600+b*60, e:c*3600+d*60}; });
+const ENG = "Иностранный язык (английский)";
+const DAYS = {
+  1:["Разговоры о важном","Русский язык","Литература","История","Биология","Математика"],
+  2:["Русский язык",ENG,"Математика","Основы безопасности и защиты Родины","Литература","Физическая культура"],
+  3:["География","Русский язык","Литература","История","Математика",ENG],
+  4:["Русский язык","Литература",ENG,"Математика","История","Русский язык","Россия — мои горизонты"],
+  5:["Математика","Физическая культура","Русский язык","Труд (технология)","Труд (технология)","Изобразительное искусство","Музыка"]
+};
+const SHORT = ["вс","пн","вт","ср","чт","пт","сб"];
+const FULL = ["воскресенье","понедельник","вторник","среда","четверг","пятница","суббота"];
+const WHEN = ["","в понедельник","во вторник","в среду","в четверг","в пятницу",""];
+const ACC = {amber:["#f5a524","#1a1200","Янтарный"],teal:["#14b8a6","#001a17","Бирюзовый"],rose:["#f43f5e","#ffffff","Малиновый"],violet:["#8b5cf6","#ffffff","Фиолетовый"],green:["#4ade80","#06200f","Зелёный"]};
+const OPTS = [
+  ["theme","Тема",[["auto","Авто"],["light","Светлая"],["dark","Тёмная"]]],
+  ["acc","Цвет",null],
+  ["font","Шрифт",[["wide","Широкий","Unbounded"],["soft","Мягкий","Nunito"],["strict","Строгий","Onest"]]],
+  ["sound","Звук звонка",[[false,"Выкл"],[true,"Вкл"]]],
+  ["warn","Предупредить заранее",[[0,"Нет"],[1,"За 1 мин"],[3,"За 3 мин"],[5,"За 5 мин"]]],
+  ["secs","Секунды",[[true,"Показывать"],[false,"Скрыть"]]],
+  ["anim","Анимации",[[true,"Вкл"],[false,"Выкл"]]]
+];
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,"0");
+const hm = s => pad(Math.floor(s/3600)%24) + ":" + pad(Math.floor(s%3600/60));
+const dayL = d => (DAYS[d]||[]).map((n,i) => ({s:BELLS[i].s, e:BELLS[i].e, n}));
+
+const KEY = "zvonok-settings";
+let S = {theme:"auto", acc:"amber", font:"wide", sound:false, warn:0, secs:true, anim:true};
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch(e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} };
+function apply(){
+  const r = document.documentElement;
+  if (S.theme==="auto") r.removeAttribute("data-theme"); else r.dataset.theme = S.theme;
+  r.dataset.font = S.font; r.dataset.anim = S.anim ? "on" : "off";
+  const a = ACC[S.acc] || ACC.amber;
+  r.style.setProperty("--acc", a[0]); r.style.setProperty("--ai", a[1]);
+}
+
+function compute(now, dow){
+  const L = dayL(dow);
+  if (L.length){
+    if (now < L[0].s) return {key:"before", kind:"before", i:0, title:"Уроки ещё не начались", sub:"Первый урок: " + L[0].n, label:"до звонка на 1 урок", remain:L[0].s-now, prog:null, at:hm(L[0].s)};
+    for (let i=0;i<L.length;i++){
+      if (now>=L[i].s && now<L[i].e)
+        return {key:"l"+i, kind:"lesson", i, title:"Идёт " + (i+1) + " урок", sub:L[i].n, label:"до звонка с урока", remain:L[i].e-now, prog:(now-L[i].s)/(L[i].e-L[i].s), at:hm(L[i].e)};
+      if (i<L.length-1 && now>=L[i].e && now<L[i+1].s)
+        return {key:"b"+i, kind:"break", i, title:"Перемена", sub:"Дальше: " + L[i+1].n, label:"до звонка на " + (i+2) + " урок", remain:L[i+1].s-now, prog:(now-L[i].e)/(L[i+1].s-L[i].e), at:hm(L[i+1].s)};
+    }
+  }
+  let k = 1;
+  while (!dayL((dow+k)%7).length) k++;
+  const nd = (dow+k)%7, N = dayL(nd);
+  return {key:"after", kind:"after", i:L.length, title:L.length ? "Уроки на сегодня закончились" : "Сегодня уроков нет", sub:"Первый урок: " + N[0].n,
+    label:"до звонка на 1 урок " + (k===1 ? "завтра" : WHEN[nd]), remain:k*86400-now+N[0].s, prog:null, at:hm(N[0].s) + " (" + SHORT[nd] + ")"};
+}
+
+function fmt(sec){
+  const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+  if (S.secs) return (h>0 ? h + ":" : "") + pad(m) + ":" + pad(s);
+  return h>0 ? h + ":" + pad(m) : Math.ceil(sec/60) + " мин";
+}
+
+const NS = "http://www.w3.org/2000/svg", ticks = [];
+for (let i=0;i<60;i++){
+  const a = i*Math.PI/30, lg = i%5===0, r1 = 146, r2 = lg ? 124 : 133;
+  const l = document.createElementNS(NS,"line");
+  l.setAttribute("x1",150+r1*Math.sin(a)); l.setAttribute("y1",150-r1*Math.cos(a));
+  l.setAttribute("x2",150+r2*Math.sin(a)); l.setAttribute("y2",150-r2*Math.cos(a));
+  l.setAttribute("class","tk" + (lg ? " lg" : "")); l.style.setProperty("--i",i);
+  $("tk").append(l); ticks.push(l);
+}
+
+let sel = 1, lastSt = null, lastDow = 1, lastKey = null, warned = null;
+function renderTabs(){
+  $("tabs").innerHTML = [1,2,3,4,5,6].map(d => '<button type="button" data-d="' + d + '" class="' + (d===lastDow ? "today" : "") + '" aria-pressed="' + (d===sel) + '">' + SHORT[d] + '</button>').join("");
+}
+function renderRows(){
+  const L = dayL(sel), st = lastSt, today = sel===lastDow;
+  if (!L.length){ $("rows").innerHTML = '<li class="empty">В этот день уроков нет.</li>'; return; }
+  $("rows").innerHTML = L.map((l,i) => {
+    let c = "";
+    if (today){
+      if (st.kind==="lesson" && st.i===i) c = "now";
+      else if (st.kind==="after" || i<st.i || (st.kind==="break" && i<=st.i)) c = "past";
+    }
+    return '<li class="' + c + '"><span class="tm"><b>' + hm(l.s) + '</b><i>' + hm(l.e) + '</i></span><span class="dt"></span><span class="nm">' + l.n + '</span></li>';
+  }).join("");
+}
+$("tabs").addEventListener("click", e => {
+  const b = e.target.closest("button[data-d]");
+  if (!b) return;
+  sel = Number(b.dataset.d); renderTabs(); renderRows();
+});
+
+let audio = null, tt;
+function unlock(){ try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); } catch(e) {} }
+document.addEventListener("pointerdown", unlock, {once:true});
+function tone(ts, f, v){
+  if (!S.sound || !audio) return;
+  ts.forEach(t => {
+    const n = audio.currentTime + t, o = audio.createOscillator(), g = audio.createGain();
+    o.type = "sine"; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, n);
+    g.gain.exponentialRampToValueAtTime(v, n+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, n+0.3);
+    o.connect(g); g.connect(audio.destination); o.start(n); o.stop(n+0.32);
+  });
+}
+const ring = () => tone([0,0.35,0.7], 880, 0.4);
+function toast(t){
+  $("toast").textContent = t; $("toast").classList.add("on");
+  clearTimeout(tt); tt = setTimeout(() => $("toast").classList.remove("on"), 4500);
+}
+
+function tick(){
+  const d = new Date(), dow = d.getDay();
+  const now = d.getHours()*3600 + d.getMinutes()*60 + d.getSeconds();
+  const st = compute(now, dow);
+  $("clock").textContent = pad(d.getHours()) + ":" + pad(d.getMinutes()) + (S.secs ? ":" + pad(d.getSeconds()) : "");
+  $("today").textContent = "Сегодня, " + FULL[dow];
+  $("status").textContent = st.title;
+  const txt = fmt(st.remain);
+  $("count").textContent = txt;
+  $("count").className = "ct" + (txt.length>5 ? " lg" : "");
+  $("label").textContent = st.label;
+  $("sub").textContent = st.sub;
+  $("bellAt").innerHTML = "Звонок в <b>" + st.at + "</b>";
+  const lit = st.prog===null ? 0 : Math.floor(st.prog*60);
+  ticks.forEach((t,i) => t.classList.toggle("on", i<lit));
+  $("bar").setAttribute("aria-valuenow", st.prog===null ? 0 : Math.round(st.prog*100));
+  document.title = txt + " — звонок";
+  lastSt = st; lastDow = dow;
+  const key = dow + st.key;
+  if (key !== lastKey){
+    renderTabs(); renderRows();
+    if (lastKey !== null){
+      ring();
+      $("logo").classList.remove("swing"); void $("logo").offsetWidth; $("logo").classList.add("swing");
+    }
+    lastKey = key;
+    warned = st.remain <= S.warn*60 ? key : null;
+  }
+  if (S.warn && st.remain <= S.warn*60 && warned !== key){
+    warned = key;
+    toast("Через " + S.warn + " мин звонок");
+    tone([0], 660, 0.25);
+  }
+}
+
+function renderSets(){
+  $("sets").innerHTML = OPTS.map(([k,t,o]) => {
+    const b = k==="acc"
+      ? Object.entries(ACC).map(([id,a]) => '<button type="button" class="sw" data-k="acc" data-v=\'"' + id + '"\' aria-label="' + a[2] + '" aria-pressed="' + (S.acc===id) + '" style="background:' + a[0] + '"></button>').join("")
+      : o.map(([v,tx,f]) => '<button type="button" data-k="' + k + '" data-v=\'' + JSON.stringify(v) + '\' aria-pressed="' + (S[k]===v) + '"' + (f ? ' style="font-family:' + f + ',sans-serif"' : '') + '>' + tx + '</button>').join("");
+    return '<div class="rw"><p>' + t + '</p><div class="sg">' + b + '</div></div>';
+  }).join("");
+}
+$("sets").addEventListener("click", e => {
+  const b = e.target.closest("button[data-k]");
+  if (!b) return;
+  S[b.dataset.k] = JSON.parse(b.dataset.v);
+  save(); apply(); renderSets();
+  if (b.dataset.k==="sound" && S.sound){ unlock(); ring(); }
+  tick();
+});
+$("gear").addEventListener("click", () => { renderSets(); $("dlg").showModal(); });
+$("close").addEventListener("click", () => $("dlg").close());
+$("dlg").addEventListener("click", e => { if (e.target===$("dlg")) $("dlg").close(); });
+
+apply();
+const t0 = new Date().getDay();
+sel = t0===0 ? 1 : t0;
+tick();
+setInterval(tick, 1000);
+</script>
+</body>
+</html>
