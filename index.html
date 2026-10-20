@@ -425,6 +425,21 @@ let pendingToken="";
  $("bm").onclick=e=>{e.preventDefault();alert("Перетащите эту ссылку в панель закладок, а не нажимайте на неё здесь.")}}
 render();setInterval(render,1000);
 {const u=localStorage.getItem("session");if(u&&users()[u])enter(u)}
+<script>
+(()=>{
+  const URL="https://moskvol.github.io/ai/";
+  // кнопка «🤖 ИИ» в шапке
+  const b=document.createElement("button");
+  b.id="aiPage";b.type="button";b.textContent="🤖 ИИ";
+  b.onclick=()=>{location.href=URL};
+  document.querySelector(".tools").prepend(b);
+  // ссылка в блоке «Спросить ИИ»
+  const a=document.createElement("div");
+  a.style.marginTop="12px";
+  a.innerHTML='<a href="'+URL+'" style="color:var(--brass2)">Открыть полную страницу ИИ →</a>';
+  const ans=document.getElementById("answer");
+  ans.parentNode.insertBefore(a,ans);
+})();
 </script>
 </body>
 </html>
