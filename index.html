@@ -199,9 +199,14 @@ let GUEST=false;const mem={};
 const store={get:k=>{if(GUEST)return mem[k]||"";try{return localStorage.getItem(pre()+k)||""}catch(e){return""}},set:(k,v)=>{if(GUEST){mem[k]=v;return}try{localStorage.setItem(pre()+k,v)}catch(e){}},del:k=>{if(GUEST){delete mem[k];return}try{localStorage.removeItem(pre()+k)}catch(e){}}};
 let simOffset=0,lastSegKey=null,soundOn=false,actx=null;
 
-// список
-\$("list").innerHTML=segs.map((g,i)=>`<div class="row ${g.type==="break"?"brk":""}" data-i="${i}"><span>${g.label}</span><span class="t">${g.a}–${g.b}</span></div>`).join("");
-const rows=[...document.querySelectorAll(".row")];
+// отрисовка расписания
+function initRows(){
+  const listEl=\$("list");
+  if(!listEl) return [];
+  listEl.innerHTML=segs.map((g,i)=>`<div class="row ${g.type==="break"?"brk":""}" data-i="${i}"><span>${g.label}</span><span class="t">${g.a}–${g.b}</span></div>`).join("");
+  return [...document.querySelectorAll(".row")];
+}
+const rows=initRows();
 
 const pad=n=>String(n).padStart(2,"0");
 const fmt=s=>{const m=Math.floor(s/60);return `${pad(m)}:${pad(s%60)}`};
@@ -217,21 +222,33 @@ function status(){
 }
 function render(){
   const st=status(),{d}=nowSec();
-  \$("clock").textContent=d.toLocaleDateString("ru-RU",{weekday:"long",day:"numeric",month:"long"})+" · "+d.toLocaleTimeString("ru-RU");
+  if($("clock")) $("clock").textContent=d.toLocaleDateString("ru-RU",{weekday:"long",day:"numeric",month:"long"})+" · "+d.toLocaleTimeString("ru-RU");
   const bar=\$("bar"),C=326.7;let key=st.k+(st.i??"");
   document.body.className=st.k==="lesson"?"is-lesson":st.k==="break"?"is-break":"";
   if(st.k==="lesson"||st.k==="break"){
-    $("state").textContent=st.g.label;$("time").textContent=fmt(st.left);
-    \$("sub").textContent=st.k==="lesson"?"до конца урока":"до звонка на урок";
-    bar.style.strokeDashoffset=C*(1-(st.total-st.left)/st.total);
-    \$("next").innerHTML=st.next?`Дальше: <b>${st.next.label}</b>, ${st.next.a}`:`Это последний урок. Звонок в <b>${st.g.b}</b>`;
+    if($("state")) $("state").textContent=st.g.label;
+    if($("time")) $("time").textContent=fmt(st.left);
+    if($("sub")) $("sub").textContent=st.k==="lesson"?"до конца урока":"до звонка на урок";
+    if(bar) bar.style.strokeDashoffset=C*(1-(st.total-st.left)/st.total);
+    if($("next")) $("next").innerHTML=st.next?`Дальше: <b>${st.next.label}</b>, ${st.next.a}`:`Это последний урок. Звонок в <b>${st.g.b}</b>`;
   }else if(st.k==="before"){
-    \$("state").textContent="Уроки ещё не начались";$("time").textContent=fmtLong(st.left);$("sub").textContent="до первого звонка";
-    bar.style.strokeDashoffset=C;\$("next").innerHTML=`Первый урок в <b>${segs[0].a}</b>`;
+    if($("state")) $("state").textContent="Уроки ещё не начались";
+    if($("time")) $("time").textContent=fmtLong(st.left);
+    if($("sub")) $("sub").textContent="до первого звонка";
+    if(bar) bar.style.strokeDashoffset=C;
+    if($("next")) $("next").innerHTML=`Первый урок в <b>${segs[0].a}</b>`;
   }else if(st.k==="after"){
-    $("state").textContent="Уроки закончились";$("time").textContent="🎒";$("sub").textContent="";bar.style.strokeDashoffset=0;$("next").innerHTML="До завтра!";
+    if($("state")) $("state").textContent="Уроки закончились";
+    if($("time")) $("time").textContent="🎒";
+    if($("sub")) $("sub").textContent="";
+    if(bar) bar.style.strokeDashoffset=0;
+    if($("next")) $("next").innerHTML="До завтра!";
   }else{
-    $("state").textContent="Выходной";$("time").textContent="😴";$("sub").textContent="";bar.style.strokeDashoffset=C;$("next").textContent="Звонков сегодня нет";
+    if($("state")) $("state").textContent="Выходной";
+    if($("time")) $("time").textContent="😴";
+    if($("sub")) $("sub").textContent="";
+    if(bar) bar.style.strokeDashoffset=C;
+    if($("next")) $("next").textContent="Звонков сегодня нет";
   }
   rows.forEach((r,i)=>{r.classList.toggle("now",st.i===i);r.classList.toggle("done",st.k==="after"||(st.i!==undefined&&i<st.i))});
   if(lastSegKey!==null&&lastSegKey!==key&&(st.k==="lesson"||st.k==="break"||st.k==="after"))ringBell();
@@ -240,13 +257,15 @@ function render(){
 
 // ---------- звонок: эффекты и звук ----------
 function ringBell(){
-  const b=\$("bellbig");b.classList.remove("ring");if(fx("swing")){void b.getBoundingClientRect();b.classList.add("ring")}
-  const f=\$("flash");f.classList.remove("go");if(fx("flash")){void f.offsetWidth;f.classList.add("go")}
+  const b=\$("bellbig");if(b){b.classList.remove("ring");if(fx("swing")){void b.getBoundingClientRect();b.classList.add("ring")}}
+  const f=\$("flash");if(f){f.classList.remove("go");if(fx("flash")){void f.offsetWidth;f.classList.add("go")}}
   const st=\$("stage");
-  for(let i=0;i<(fx("rings")?4:0);i++){const w=document.createElement("div");w.className="wave";w.style.animationDelay=i*.35+"s";st.appendChild(w);setTimeout(()=>w.remove(),3600)}
-  for(let i=0;i<(fx("notes")?10:0);i++){const n=document.createElement("div");n.className="note";n.textContent=["🔔","✨","🎵"][i%3];
-    n.style.left="50%";n.style.top="45%";n.style.setProperty("--dx",(Math.random()*340-170)+"px");n.style.setProperty("--dy",(Math.random()*-220-30)+"px");n.style.setProperty("--r",(Math.random()*80-40)+"deg");
-    st.appendChild(n);setTimeout(()=>n.remove(),2600)}
+  if(st){
+    for(let i=0;i<(fx("rings")?4:0);i++){const w=document.createElement("div");w.className="wave";w.style.animationDelay=i*.35+"s";st.appendChild(w);setTimeout(()=>w.remove(),3600)}
+    for(let i=0;i<(fx("notes")?10:0);i++){const n=document.createElement("div");n.className="note";n.textContent=["🔔","✨","🎵"][i%3];
+      n.style.left="50%";n.style.top="45%";n.style.setProperty("--dx",(Math.random()*340-170)+"px");n.style.setProperty("--dy",(Math.random()*-220-30)+"px");n.style.setProperty("--r",(Math.random()*80-40)+"deg");
+      st.appendChild(n);setTimeout(()=>n.remove(),2600)}
+  }
   if(fx("vibr")&&navigator.vibrate)try{navigator.vibrate([200,100,200])}catch(e){}
   if(soundOn)playBell();
 }
@@ -415,7 +434,14 @@ function hello(){
   const close=()=>{el.classList.add("out");setTimeout(()=>{el.hidden=true},900);clearTimeout(t)};
   const t=setTimeout(close,3400);el.onclick=close;
 }
-function enter(u){USER=u;loadTheme();if(pendingToken){store.set("mes",pendingToken);store.del("pid");store.del("mesName");pendingToken=""}$("auth").hidden=true;$("authBtn").hidden=true;$("logout").hidden=false;$("logout").textContent="Выйти ("+u+")";showWho();if(store.get("mes"))load();hello()}
+function enter(u){
+  USER=u;loadTheme();
+  if(pendingToken){store.set("mes",pendingToken);store.del("pid");store.del("mesName");pendingToken=""}
+  $("auth").hidden=true;$("authBtn").hidden=true;$("logout").hidden=false;$("logout").textContent="Выйти ("+u+")";
+  showWho();
+  if(store.get("mes"))load();
+  hello();
+}
 $("authBtn").onclick=()=>{$("auth").hidden=false};
 $("closeAuth").onclick=()=>{$("auth").hidden=true};
 
@@ -444,8 +470,19 @@ let pendingToken="";
  $("bm").setAttribute("href","javascript:"+encodeURIComponent(code).replace(/'/g,"%27"));
  $("bm").onclick=e=>{e.preventDefault();alert("Перетащите эту ссылку в панель закладок, а не нажимайте на неё здесь.")}}
 
-render();setInterval(render,1000);
-{const u=localStorage.getItem("session");if(u&&users()[u])enter(u)}
+// Первичный запуск часов и таймеров
+render();
+setInterval(render,1000);
+
+// Безопасное чтение сессии
+try{
+  const u=localStorage.getItem("session");
+  if(u){
+    const uList=users();
+    if(uList[u]||u==="гость"){ enter(u); }
+    else { localStorage.removeItem("session"); }
+  }
+}catch(e){ console.warn(e); }
 </script>
 </body>
 </html>
