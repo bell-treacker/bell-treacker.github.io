@@ -13,15 +13,15 @@
 html,body{min-height:100%}
 body{background:radial-gradient(900px 500px at 50% -10%,var(--glow) 0,transparent 70%),var(--bg);color:var(--ink);font:400 16px/1.5 var(--body);padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0);overflow-x:hidden}
 body.is-break{--accent:var(--break)}body.is-lesson{--accent:var(--brass)}body{--accent:var(--dim)}
-header{max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+header{max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:18px 0;flex-wrap:wrap;gap:10px}
 .logo{display:flex;align-items:center;gap:12px;font:700 20px var(--disp);letter-spacing:.02em}
 .logo svg{width:44px;height:44px;transform-origin:50% 10%;animation:idle 6s ease-in-out infinite}
 @keyframes idle{0%,90%,100%{transform:rotate(0)}93%{transform:rotate(10deg)}96%{transform:rotate(-8deg)}}
-.tools{display:flex;gap:8px}
-button{font:500 14px var(--body);color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer;transition:transform .15s,background .2s}
-button:hover{background:var(--hov)}button:active{transform:scale(.96)}
-button.primary{background:var(--brass);color:var(--onacc);border-color:var(--brass);font-weight:600}
-button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--brass2);outline-offset:2px}
+.tools{display:flex;gap:8px;align-items:center}
+button, a.btn{font:500 14px var(--body);color:var(--ink);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px 14px;cursor:pointer;transition:transform .15s,background .2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+button:hover, a.btn:hover{background:var(--hov)}button:active, a.btn:active{transform:scale(.96)}
+button.primary, a.btn.primary{background:var(--brass);color:var(--onacc);border-color:var(--brass);font-weight:600}
+button:focus-visible,input:focus-visible,textarea:focus-visible, a.btn:focus-visible{outline:2px solid var(--brass2);outline-offset:2px}
 main{max-width:920px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:20px;padding-bottom:40px}
 @media(max-width:760px){main{grid-template-columns:1fr}}
 .stage{position:relative;background:linear-gradient(160deg,var(--bg2),var(--deep));border:1px solid var(--line);border-radius:28px;padding:28px 20px;text-align:center;overflow:hidden}
@@ -108,7 +108,12 @@ select{width:100%;font:400 15px var(--body);color:var(--ink);background:var(--bg
       <circle cx="32" cy="7" r="4" style="fill:var(--brass2)"/><path d="M32 10c-10 0-17 8-17 19v10l-6 8h46l-6-8V29c0-11-7-19-17-19z" fill="url(#g)"/><path d="M22 20c3-4 7-6 11-6" stroke="#fff6dc" stroke-width="3" stroke-linecap="round" fill="none" opacity=".7"/><path d="M26 51a6 6 0 0 0 12 0z" style="fill:var(--brass)"/></svg>
     Перемена
   </div>
-  <div class="tools"><button id="sound" aria-pressed="false">🔈 Звук выкл</button><button id="logout" hidden>Выйти</button><button id="gear">Настройки</button></div>
+  <div class="tools">
+    <a href="https://moskvol.github.io/ai/" class="btn" title="Открыть ИИ Помощник">🤖 ИИ</a>
+    <button id="sound" aria-pressed="false">🔈 Звук выкл</button>
+    <button id="logout" hidden>Выйти</button>
+    <button id="gear">Настройки</button>
+  </div>
 </header>
 <main>
   <section class="stage" id="stage">
@@ -128,6 +133,7 @@ select{width:100%;font:400 15px var(--body);color:var(--ink);background:var(--bg
     <h2>Спросить ИИ</h2>
     <form id="aiForm"><input id="q" placeholder="Например: успею ли я в столовую на перемене?" autocomplete="off"><button class="primary">Спросить</button></form>
     <div class="chips"><button type="button" data-q="Что лучше сделать на ближайшей перемене?">Что делать на перемене?</button><button type="button" data-q="Сколько всего уроков осталось сегодня и когда я освобожусь?">Когда домой?</button></div>
+    <div style="margin-top:12px"><a href="https://moskvol.github.io/ai/" style="color:var(--brass2);text-decoration:none">Открыть полную страницу ИИ →</a></div>
     <div id="answer"></div>
   </section>
 </main>
@@ -182,14 +188,14 @@ LESSONS.forEach((l,i)=>{
   if(i<LESSONS.length-1){const n=LESSONS[i+1];segs.push({type:"break",n:i+1,s:toMin(l[1])*60,e:toMin(n[0])*60,label:`Перемена ${(toMin(n[0])-toMin(l[1]))} мин`,a:l[1],b:n[0]});}
 });
 const DAYSTART=segs[0].s,DAYEND=segs[segs.length-1].e;
-const $=id=>document.getElementById(id);
+const \$=id=>document.getElementById(id);
 let USER="";const pre=()=>USER?"u:"+USER+":":"";
 let GUEST=false;const mem={};
 const store={get:k=>{if(GUEST)return mem[k]||"";try{return localStorage.getItem(pre()+k)||""}catch(e){return""}},set:(k,v)=>{if(GUEST){mem[k]=v;return}try{localStorage.setItem(pre()+k,v)}catch(e){}},del:k=>{if(GUEST){delete mem[k];return}try{localStorage.removeItem(pre()+k)}catch(e){}}};
 let simOffset=0,lastSegKey=null,soundOn=false,actx=null;
 
 // список
-$("list").innerHTML=segs.map((g,i)=>`<div class="row ${g.type==="break"?"brk":""}" data-i="${i}"><span>${g.label}</span><span class="t">${g.a}–${g.b}</span></div>`).join("");
+\$("list").innerHTML=segs.map((g,i)=>`<div class="row ${g.type==="break"?"brk":""}" data-i="${i}"><span>${g.label}</span><span class="t">${g.a}–${g.b}</span></div>`).join("");
 const rows=[...document.querySelectorAll(".row")];
 
 const pad=n=>String(n).padStart(2,"0");
@@ -206,17 +212,17 @@ function status(){
 }
 function render(){
   const st=status(),{d}=nowSec();
-  $("clock").textContent=d.toLocaleDateString("ru-RU",{weekday:"long",day:"numeric",month:"long"})+" · "+d.toLocaleTimeString("ru-RU");
-  const bar=$("bar"),C=326.7;let key=st.k+(st.i??"");
+  \$("clock").textContent=d.toLocaleDateString("ru-RU",{weekday:"long",day:"numeric",month:"long"})+" · "+d.toLocaleTimeString("ru-RU");
+  const bar=\$("bar"),C=326.7;let key=st.k+(st.i??"");
   document.body.className=st.k==="lesson"?"is-lesson":st.k==="break"?"is-break":"";
   if(st.k==="lesson"||st.k==="break"){
     $("state").textContent=st.g.label;$("time").textContent=fmt(st.left);
-    $("sub").textContent=st.k==="lesson"?"до конца урока":"до звонка на урок";
+    \$("sub").textContent=st.k==="lesson"?"до конца урока":"до звонка на урок";
     bar.style.strokeDashoffset=C*(1-(st.total-st.left)/st.total);
-    $("next").innerHTML=st.next?`Дальше: <b>${st.next.label}</b>, ${st.next.a}`:`Это последний урок. Звонок в <b>${st.g.b}</b>`;
+    \$("next").innerHTML=st.next?`Дальше: <b>${st.next.label}</b>, ${st.next.a}`:`Это последний урок. Звонок в <b>${st.g.b}</b>`;
   }else if(st.k==="before"){
-    $("state").textContent="Уроки ещё не начались";$("time").textContent=fmtLong(st.left);$("sub").textContent="до первого звонка";
-    bar.style.strokeDashoffset=C;$("next").innerHTML=`Первый урок в <b>${segs[0].a}</b>`;
+    \$("state").textContent="Уроки ещё не начались";$("time").textContent=fmtLong(st.left);$("sub").textContent="до первого звонка";
+    bar.style.strokeDashoffset=C;\$("next").innerHTML=`Первый урок в <b>${segs[0].a}</b>`;
   }else if(st.k==="after"){
     $("state").textContent="Уроки закончились";$("time").textContent="🎒";$("sub").textContent="";bar.style.strokeDashoffset=0;$("next").innerHTML="До завтра!";
   }else{
@@ -229,9 +235,9 @@ function render(){
 
 // ---------- звонок: эффекты и звук ----------
 function ringBell(){
-  const b=$("bellbig");b.classList.remove("ring");if(fx("swing")){void b.getBoundingClientRect();b.classList.add("ring")}
-  const f=$("flash");f.classList.remove("go");if(fx("flash")){void f.offsetWidth;f.classList.add("go")}
-  const st=$("stage");
+  const b=\$("bellbig");b.classList.remove("ring");if(fx("swing")){void b.getBoundingClientRect();b.classList.add("ring")}
+  const f=\$("flash");f.classList.remove("go");if(fx("flash")){void f.offsetWidth;f.classList.add("go")}
+  const st=\$("stage");
   for(let i=0;i<(fx("rings")?4:0);i++){const w=document.createElement("div");w.className="wave";w.style.animationDelay=i*.35+"s";st.appendChild(w);setTimeout(()=>w.remove(),3600)}
   for(let i=0;i<(fx("notes")?10:0);i++){const n=document.createElement("div");n.className="note";n.textContent=["🔔","✨","🎵"][i%3];
     n.style.left="50%";n.style.top="45%";n.style.setProperty("--dx",(Math.random()*340-170)+"px");n.style.setProperty("--dy",(Math.random()*-220-30)+"px");n.style.setProperty("--r",(Math.random()*80-40)+"deg");
@@ -246,15 +252,17 @@ function playBell(){
       o.type="sine";o.frequency.value=f*(1+j*.003);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.5,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+1.6-j*.25);
       o.connect(g).connect(actx.destination);o.start(t);o.stop(t+1.7)});});}catch(e){}
 }
-$("sound").onclick=()=>{soundOn=!soundOn;$("sound").textContent=soundOn?"🔔 Звук вкл":"🔈 Звук выкл";$("sound").setAttribute("aria-pressed",soundOn);if(soundOn)playBell()};
-$("test").onclick=ringBell;
+\$("sound").onclick=()=>{soundOn=!soundOn;$("sound").textContent=soundOn?"🔔 Звук вкл":"🔈 Звук выкл";$("sound").setAttribute("aria-pressed",soundOn);if(soundOn)playBell()};
+\$("test").onclick=ringBell;
 
-// ---------- МЭШ (Подмосковье) ----------
-// Адреса не проверены на живом аккаунте — при ошибке поправьте здесь.
-const EP={base:"https://api.school.mosreg.ru",ctx:"/v1/users/me/context",
- schedule:"/v2/persons/{pid}/schedule?startDate={from}&endDate={to}",
- hw:"/v2/persons/{pid}/homeworks?startDate={from}&endDate={to}",
- marks:"/v2/persons/{pid}/marks?startDate={from}&endDate={to}"};
+// ---------- МЭШ через прокси Cloudflare ----------
+const EP={
+  base:"https://square-tree-8e11.daniilgudilin555.workers.dev",
+  ctx:"/v1/users/me/context",
+  schedule:"/v2/persons/{pid}/schedule?startDate={from}&endDate={to}",
+  hw:"/v2/persons/{pid}/homeworks?startDate={from}&endDate={to}",
+  marks:"/v2/persons/{pid}/marks?startDate={from}&endDate={to}"
+};
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return d};
 async function api(path){
@@ -279,8 +287,9 @@ async function mesCheck(){
   try{await pid();s.style.color="var(--break)";s.textContent="Вы вошли: "+(store.get("mesName")||"ученик");showWho();load()}
   catch(e){s.style.color="var(--bad)";s.textContent=(e instanceof TypeError)?"Браузер заблокировал запрос (CORS): без прокси дневник может быть недоступен.":e.message}
 }
-function showWho(){const n=store.get("mesName");$("gear").textContent=n?"👤 "+n:"Настройки"}
-$("mesCheck").onclick=mesCheck;
+function showWho(){const n=store.get("mesName");\$("gear").textContent=n?"👤 "+n:"Настройки"}
+\$("mesCheck").onclick=mesCheck;
+
 // ---------- Сегодня / Домашка / Оценки ----------
 let tab="today";
 const arr=j=>{if(Array.isArray(j))return j;if(!j)return[];for(const k of["items","lessons","homeworks","marks","days","data"])if(Array.isArray(j[k]))return j[k];return[]};
@@ -304,10 +313,9 @@ async function load(){
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));load()});
 
 // ---------- ИИ ----------
-// ИИ по умолчанию для всех аккаунтов и гостей (GPTunnel). Свои значения в настройках главнее.
 const DEFAULT_AI={url:"https://gptunnel.ru/v1/chat/completions",key:"shds-QVYyL08lcnuuOLWXdx0NPTQgOyM",model:"grom-1.5-pro"};
 async function ask(q){
-  const a=$("answer"),key=store.get("key")||DEFAULT_AI.key,url=store.get("aiUrl")||DEFAULT_AI.url,model=store.get("aiModel")||DEFAULT_AI.model;a.className="";
+  const a=\$("answer"),key=store.get("key")||DEFAULT_AI.key,url=store.get("aiUrl")||DEFAULT_AI.url,model=store.get("aiModel")||DEFAULT_AI.model;a.className="";
   if(!url||!model){a.className="err";a.textContent="Укажите адрес API и модель в настройках.";return}
   a.textContent="Думаю…";
   const st=status(),{d}=nowSec();
@@ -355,6 +363,7 @@ $("fxs").onchange=e=>{const k=e.target.dataset.fx;if(k){TH.fx[k]=e.target.checke
 $("acc").oninput=e=>{TH.accent=e.target.value;store.set("theme",JSON.stringify(TH));applyTheme()};
 $("accReset").onclick=()=>{TH.accent="";saveTheme()};
 applyTheme();
+
 // ---------- список моделей из API ----------
 async function loadModels(){
   const st=$("modelMsg"),url=$("aiUrl").value.trim()||DEFAULT_AI.url,key=$("key").value.trim()||DEFAULT_AI.key;
@@ -373,11 +382,13 @@ async function loadModels(){
 }
 $("modelsBtn").onclick=loadModels;
 $("modelSel").onchange=e=>{if(e.target.value){$("aiModel").value=e.target.value;store.set("aiModel",e.target.value)}};
+
 // ---------- настройки ----------
 const F=["mes","key","aiUrl","aiModel"];
 $("gear").onclick=()=>{themeUI();F.forEach(k=>$(k).value=store.get(k));$("dlg").showModal()};
 $("save").onclick=()=>{F.forEach(k=>{const v=$(k).value.trim();v?store.set(k,v):store.del(k)});$("dlg").close()};
 $("clear").onclick=()=>{[...F,"mesName","pid"].forEach(k=>store.del(k));F.forEach(k=>$(k).value="");$("mesStatus").textContent="";showWho()};
+
 // ---------- вход и регистрация (локально, в этом браузере) ----------
 const enc=new TextEncoder(),b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
 async function hash(pw,salt){const k=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveBits"]);
@@ -388,6 +399,7 @@ document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.datase
   document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("on",x===b));
   $("ap2").hidden=mode==="in";$("ap2").required=mode==="up";$("abtn").textContent=mode==="in"?"Войти":"Создать аккаунт";$("amsg").textContent="";
   $("ap").autocomplete=mode==="in"?"current-password":"new-password"});
+
 // ---------- приветствие ----------
 function hello(){
   if(!fx("hello"))return;
@@ -416,6 +428,7 @@ $("authForm").onsubmit=async e=>{e.preventDefault();
 };
 $("guest").onclick=()=>{GUEST=true;enter("гость")};
 $("logout").onclick=()=>{try{localStorage.removeItem("session")}catch(e){}location.reload()};
+
 // ---------- вход через дневник одним нажатием ----------
 let pendingToken="";
 {const m=location.hash.match(/token=([^&]+)/);if(m){try{pendingToken=decodeURIComponent(m[1])}catch(e){}history.replaceState(null,"",location.pathname+location.search)}}
@@ -425,21 +438,6 @@ let pendingToken="";
  $("bm").onclick=e=>{e.preventDefault();alert("Перетащите эту ссылку в панель закладок, а не нажимайте на неё здесь.")}}
 render();setInterval(render,1000);
 {const u=localStorage.getItem("session");if(u&&users()[u])enter(u)}
-<script>
-(()=>{
-  const URL="https://moskvol.github.io/ai/";
-  // кнопка «🤖 ИИ» в шапке
-  const b=document.createElement("button");
-  b.id="aiPage";b.type="button";b.textContent="🤖 ИИ";
-  b.onclick=()=>{location.href=URL};
-  document.querySelector(".tools").prepend(b);
-  // ссылка в блоке «Спросить ИИ»
-  const a=document.createElement("div");
-  a.style.marginTop="12px";
-  a.innerHTML='<a href="'+URL+'" style="color:var(--brass2)">Открыть полную страницу ИИ →</a>';
-  const ans=document.getElementById("answer");
-  ans.parentNode.insertBefore(a,ans);
-})();
 </script>
 </body>
 </html>
