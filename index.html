@@ -109,7 +109,7 @@ select{width:100%;font:400 15px var(--body);color:var(--ink);background:var(--bg
     Перемена
   </div>
   <div class="tools">
-    <a href="https://moskvol.github.io/ai/" class="btn" title="Открыть ИИ Помощник">🤖 ИИ</a>
+    <a href="https://moskvol.github.io/ai/" class="btn" title="Открыть ИИ">🤖 ИИ</a>
     <button id="sound" aria-pressed="false">🔈 Звук выкл</button>
     <button id="logout" hidden>Выйти</button>
     <button id="gear">Настройки</button>
@@ -178,6 +178,7 @@ select{width:100%;font:400 15px var(--body);color:var(--ink);background:var(--bg
   <div style="color:var(--dim);font-size:13px;text-align:center;margin-top:8px">Настройки гостя не сохраняются после закрытия сайта.</div>
 </div></div>
 <div class="hello" id="hello" hidden><div class="w w1"></div><div class="w w2"></div><div class="w w3"></div><div class="msg"><div class="g" id="hg"></div><div class="n" id="hn"></div></div></div>
+
 <script>
 // ---------- расписание: только время ----------
 const LESSONS=[["09:00","09:40"],["09:55","10:35"],["10:55","11:35"],["11:50","12:30"],["12:50","13:30"],["13:50","14:30"]];
@@ -285,7 +286,7 @@ async function mesCheck(){
   const s=$("mesStatus");store.set("mes",$("mes").value.trim());store.del("pid");
   s.style.color="var(--dim)";s.textContent="Проверяю…";
   try{await pid();s.style.color="var(--break)";s.textContent="Вы вошли: "+(store.get("mesName")||"ученик");showWho();load()}
-  catch(e){s.style.color="var(--bad)";s.textContent=(e instanceof TypeError)?"Браузер заблокировал запрос (CORS): без прокси дневник может быть недоступен.":e.message}
+  catch(e){s.style.color="var(--bad)";s.textContent=(e instanceof TypeError)?"Браузер заблокировал запрос (CORS): проверьте статус воркера в Cloudflare.":e.message}
 }
 function showWho(){const n=store.get("mesName");\$("gear").textContent=n?"👤 "+n:"Настройки"}
 \$("mesCheck").onclick=mesCheck;
@@ -308,7 +309,7 @@ async function load(){
     if(tab==="marks"){const it=arr(await api(fill(EP.marks,addDays(-30),new Date())));
       rows=it.map(x=>`<div class="item"><div>${esc(g(x,"subject.name","subjectName"))}<small>${esc(String(g(x,"date","createdAt")).slice(0,10))}</small></div><div class="mark">${esc(g(x,"value","mark","markValue"))}</div></div>`)}
     L.innerHTML=rows.join("");m.textContent=rows.length?"":"Ничего не найдено. Если это неверно, откройте «Ответ сервера» ниже.";
-  }catch(e){m.className="err";m.textContent=(e instanceof TypeError)?"Браузер заблокировал запрос (CORS): без прокси дневник может быть недоступен.":e.message}
+  }catch(e){m.className="err";m.textContent=(e instanceof TypeError)?"Ошибка связи с прокси или сервером дневника.":e.message}
 }
 document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));load()});
 
@@ -436,6 +437,7 @@ let pendingToken="";
  const code="(async()=>{try{const r=await fetch('/v2/token/refresh?roleId=1&subsystem=2',{credentials:'include'});const t=(await r.text()).trim();let k=t;try{const j=JSON.parse(t);k=typeof j==='string'?j:(j.token||j.accessToken||j.access_token||(j.data&&j.data.token)||'')}catch(e){}if(!k||k.length<20)throw 0;location.href='"+site+"#token='+encodeURIComponent(k)}catch(e){alert('Сначала войдите в аккаунт дневника, затем нажмите закладку снова.')}})()";
  $("bm").setAttribute("href","javascript:"+encodeURIComponent(code).replace(/'/g,"%27"));
  $("bm").onclick=e=>{e.preventDefault();alert("Перетащите эту ссылку в панель закладок, а не нажимайте на неё здесь.")}}
+
 render();setInterval(render,1000);
 {const u=localStorage.getItem("session");if(u&&users()[u])enter(u)}
 </script>
